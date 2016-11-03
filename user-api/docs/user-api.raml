@@ -1,0 +1,169 @@
+#%RAML 0.8
+title: DB API for users and items
+baseUri: http://localhost:9090
+version: v1
+
+securitySchemes:
+  - BasicAuth:
+      type: Basic Authentication
+
+traits:
+  - admin:
+      description: admin with admin flag is true
+  - owner:
+      description: userself
+  - secured:
+      description: Basic Auth
+
+/users:
+  description: manipulate users, only admin can do this
+  is: [secured, admin]
+  securedBy: BasicAuth
+  get:
+    description: get all users in a list
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              [
+                {
+                  "name": "admin",
+                  "createdDatetime": "2016-07-01 17:00:00",
+                  "isAdmin": true
+                },
+                {
+                  "name": "xiaoming",
+                  "createdDatetime": "2016-07-01 17:00:00",
+                  "isAdmin": false
+                },
+                {
+                  "name": "meimei"
+                  "createdDatetime": "2016-07-01 17:00:00",
+                  "isAdmin": false
+                }
+              ]
+  post:
+    description: create a new user
+    body:
+      application/json:
+        formParameters:
+          name:
+            description: user name
+            type: string
+            required: true
+          password:
+            description: password
+            type: string
+            required: true
+          isAdmin:
+            description: admin flag and only admin can add or remove users
+            type: boolean
+            required: true
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "name": "John",
+                "createdDatetime": "2016-07-02 17:00:00",
+                "isAdmin": false
+              }
+      401:
+        body:
+          application/json:
+            example: |
+              {
+                "message": "unauthroised"
+              }
+      403:
+        body:
+          application/json:
+            example: |
+              {
+                "message": "no permission to do it"
+              }
+
+/users/{username}:
+  description: show a user information, only admin can do this
+  uriParameters:
+    username:
+      description: given user name
+      type: string
+      required: true
+  is: [secured, admin]
+  securedBy: BasicAuth
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "name": "John",
+                "createdDatetime": "2016-07-02 17:00:00",
+                "isAdmin": false
+              }
+      400:
+        body:
+          application/json:
+            example: |
+              {
+                "message": "can't find the user with name {username}"
+              }
+  delete:
+    description: remove a user
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "message": "{username} has been removed."
+              }
+      400:
+        body:
+          application/json:
+            example: |
+              {
+                "message": "bad user name"
+              }
+      401:
+        body:
+          application/json:
+            example: |
+              {
+                "message": "wrong username or password"
+              }
+      403:
+        body:
+          application/json:
+            example: |
+              {
+                "message": "no permission to remove a user"
+              }
+
+/users/authenticate:
+  description: check if the username and password are correct and matched
+  is: [secured]
+  securedBy: BasicAuth
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "name": "meimei",
+                "createdDatetime": "2016-07-01 17:00:00",
+                "isAdmin": false
+              }
+      401:
+        body:
+          application/json:
+            example: |
+              {
+                "message": "wrong username or password"
+              }
+
