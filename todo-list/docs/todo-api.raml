@@ -3,30 +3,10 @@ title: Todo App API document
 baseUri: http://localhost:8080
 version: v1
 
-securitySchemes:
-  - BasicAuth:
-      type: Basic Authentication
-
-traits:
-  - unsecured:
-      description: no need Basic Auth
-  - secured:
-      description: need Basic Auth
-  - admin:
-      description: admin which means admin flag is true
-  - owner:
-      description: the owner of the item
-
-/todos?who={name}:
+/todos:
   get:
     description: return all todo items in a list
-    is: [unsecured]
     queryParameters:
-      who:
-        description: the name to be filtered
-        type: string
-        required: true
-        example: xiaoming
       completed:
         description: filter for completion
         type: boolean
@@ -41,7 +21,6 @@ traits:
                 {
                   "id": 1,
                   "title": "sample title with id 1",
-                  "who": "xiaoming",
                   "completed": true,
                   "updatedDatetime": "2016-07-13 17:00:00",
                   "createdDatetime": "2016-07-13 17:00:00"
@@ -49,19 +28,14 @@ traits:
                 {
                   "id": 2,
                   "title": "sample title with id 2",
-                  "who": "xiaoming",
                   "completed": false,
                   "updatedDatetime": "2016-07-15 11:10:00",
                   "createdDatetime": "2016-07-15 11:00:00"
                 }
               ]
-      400:
-        description: bad request since query parameter {who} is not present
 
   post:
     description: create a new todo item
-    is: [secured]
-    securedBy: BasicAuth
     body:
       application/json:
         formParameters:
@@ -70,15 +44,6 @@ traits:
             type: string
             required: true
             example: the title of the new item
-          username:
-            description: the username
-            required: true
-            type: string
-            example: xiaoming
-          password:
-            description: the password
-            required: true
-            type: string
     responses:
       200:
         body:
@@ -87,24 +52,17 @@ traits:
               {
                 "id": 1,
                 "title": "the title for the new todo item",
-                "who": "xiaoming",
                 "completed": false,
                 "createdDatetime": "2016-07-01 17:00:00",
                 "updatedDatetime": "2016-07-01 17:00:00"
               }
       400:
+        description: if title is null or emppty
         body:
           application/json:
             example: |
               {
                 "message": "title shouldn't be empty."
-              }
-      401:
-        body:
-          application/json:
-            example: |
-              {
-                "message": "your username or password is wrong."
               }
 
 /todos/{itemId}:
@@ -113,60 +71,14 @@ traits:
       description: the item id
       type: integer
       required: true
-  get:
-    description: retrieve one item by given item id
-    is: [unsecured]
-    responses:
-      200:
-        description: successfully find a created item
-        body:
-          application/json:
-            example: |
-              {
-                "id": 1,
-                "title": "the title for the new todo item",
-                "who": "xiaoming",
-                "completed": false,
-                "createdDatetime": "2016-07-01 17:00:00",
-                "updatedDatetime": "2016-07-01 17:00:00"
-              }
-      400:
-        description: can't find any item by given item id
-        body:
-          application/json:
-            example: |
-              {
-                "message": "can't find the item with the given item id"
-              }
-  put:
+  patch:
     description: update existing item
-    is: [secured, owner, admin]
-    securedBy: BasicAuth
     body:
       application/json:
-        formParameters:
-          id:
-            description: id of the item
-            type: integer
-            required: true
-          title:
-            description: the title of the item to be added
-            type: string
-            required: true
-            example: the title of the new item
-          summary:
-            description: the summary of the item to be added
-            type: string
-            required: true
-            example: the summary of the new item
-          username:
-            description: the username
-            required: true
-            type: string
-          password:
-            description: the password
-            required: true
-            type: string
+        example: |
+          {
+            "title": "updated title"
+          }
     responses:
       200:
         body:
@@ -174,30 +86,21 @@ traits:
             example: |
               {
                 "id": 1,
-                "title": "the title for the updated todo item",
-                "who": "xiaoming",
+                "title": "updated title",
                 "completed": false,
                 "createdDatetime": "2016-07-01 17:10:00",
                 "updatedDatetime": "2016-07-01 17:00:00"
               }
       400:
+        description: if title is null or empty
         body:
           application/json:
             example: |
               {
                 "message": "title shouldn't be empty."
               }
-      401:
-        body:
-          application/json:
-            example: |
-              {
-                "message": "your username or password is wrong."
-              }
   delete:
     description: remove an item
-    is: [secured, owner, admin]
-    securedBy: BasicAuth
     responses:
       200:
         body:
@@ -212,11 +115,4 @@ traits:
             example: |
               {
                 "message": "wrong item id."
-              }
-      401:
-        body:
-          application/json:
-            example: |
-              {
-                "message": "unauthorized."
               }
