@@ -13,6 +13,7 @@ buildscript {
 plugins {
   id 'java'
   id 'idea'
+  id 'jacoco'
 }
 apply plugin: 'spring-boot'
 
@@ -23,6 +24,16 @@ jar {
   baseName = 'todo-list'
   version =  '0.1.0'
 }
+
+jacocoTestReport {
+  reports {
+    xml.enabled false
+    csv.enabled false
+    html.destination "${buildDir}/jacocoHtml"
+  }
+}
+
+check.dependsOn jacocoTestReport
 
 repositories {
   mavenCentral()
@@ -36,4 +47,3 @@ dependencies {
   testCompile 'junit:junit:4.12'
   testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
-
