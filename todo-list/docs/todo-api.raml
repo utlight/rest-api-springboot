@@ -17,7 +17,7 @@ traits:
   - owner:
       description: the owner of the item
 
-/todos:
+/todos?who={name}:
   get:
     description: return all todo items in a list
     is: [unsecured]
@@ -25,8 +25,13 @@ traits:
       who:
         description: the name to be filtered
         type: string
-        required: false
+        required: true
         example: xiaoming
+      completed:
+        description: filter for completion
+        type: boolean
+        required: false
+        example: true
     responses:
       200:
         body:
@@ -38,20 +43,21 @@ traits:
                   "title": "sample title with id 1",
                   "who": "xiaoming",
                   "completed": true,
-                  "order": 1,
                   "updatedDatetime": "2016-07-13 17:00:00",
                   "createdDatetime": "2016-07-13 17:00:00"
                 },
                 {
                   "id": 2,
                   "title": "sample title with id 2",
-                  "who": "meimei",
+                  "who": "xiaoming",
                   "completed": false,
-                  "order": 2,
                   "updatedDatetime": "2016-07-15 11:10:00",
                   "createdDatetime": "2016-07-15 11:00:00"
                 }
               ]
+      400:
+        description: bad request since query parameter {who} is not present
+
   post:
     description: create a new todo item
     is: [secured]
@@ -64,11 +70,6 @@ traits:
             type: string
             required: true
             example: the title of the new item
-          summary:
-            description: the summary of the item to be added
-            type: string
-            required: true
-            example: the summary of the new item
           username:
             description: the username
             required: true
@@ -86,10 +87,8 @@ traits:
               {
                 "id": 1,
                 "title": "the title for the new todo item",
-                "summary": "the summary for the new todo item",
                 "who": "xiaoming",
                 "completed": false,
-                "order": 2,
                 "createdDatetime": "2016-07-01 17:00:00",
                 "updatedDatetime": "2016-07-01 17:00:00"
               }
@@ -126,10 +125,8 @@ traits:
               {
                 "id": 1,
                 "title": "the title for the new todo item",
-                "summary": "the summary for the new todo item",
                 "who": "xiaoming",
                 "completed": false,
-                "order": 2,
                 "createdDatetime": "2016-07-01 17:00:00",
                 "updatedDatetime": "2016-07-01 17:00:00"
               }
@@ -178,10 +175,8 @@ traits:
               {
                 "id": 1,
                 "title": "the title for the updated todo item",
-                "summary": "the summary for the updated todo item",
                 "who": "xiaoming",
                 "completed": false,
-                "order": 2,
                 "createdDatetime": "2016-07-01 17:10:00",
                 "updatedDatetime": "2016-07-01 17:00:00"
               }
