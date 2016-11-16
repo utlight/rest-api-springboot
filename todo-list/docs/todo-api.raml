@@ -38,12 +38,10 @@ version: v1
     description: create a new todo item
     body:
       application/json:
-        formParameters:
-          title:
-            description: the title of the item to be added
-            type: string
-            required: true
-            example: the title of the new item
+        example: |
+          {
+            "title": "new todo item title"
+          }
     responses:
       200:
         body:
@@ -99,6 +97,14 @@ version: v1
               {
                 "message": "title shouldn't be empty."
               }
+      404:
+        description: item is not found
+        body:
+          application/json:
+            example: |
+              {
+                "message": "the todo item couldn't be found."
+              }
   delete:
     description: remove an item
     responses:
@@ -109,10 +115,11 @@ version: v1
               {
                 "message": "item has been removed successfully."
               }
-      400:
+      404:
+        description: item is not found
         body:
           application/json:
             example: |
               {
-                "message": "wrong item id."
+                "message": "the todo item couldn't be found."
               }
